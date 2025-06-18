@@ -1,0 +1,6 @@
+.vscode/
+bonitossn/__pychache__
+bonitossn/model/__pychache__
+utils/
+trained_bonito/checkpoints/
+mlapp-gu3_s323700_s30174.pdf
