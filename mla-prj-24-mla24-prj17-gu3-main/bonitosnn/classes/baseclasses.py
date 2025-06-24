@@ -1015,7 +1015,7 @@ class BaseBasecaller():
 
         assert isinstance(dataset, BaseFast5Dataset)
 
-        self.dataset = DataLoader(dataset, batch_size=1, shuffle=False, num_workers = 2)
+        self.dataset = DataLoader(dataset, batch_size=1, shuffle=False, num_workers = 2) #TODO: change to 4 in original (just change for Colab)
         self.model = model
         self.batch_size = batch_size
         self.output_file = output_file

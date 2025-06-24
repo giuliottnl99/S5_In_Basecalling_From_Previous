@@ -83,7 +83,8 @@ if __name__ == '__main__':
         'halcyon',
         'bonitosnn',
         'bonitospikeconv',
-        'bonitospikelin'
+        'bonitospikelin',
+        'S5'
     ], help='Model')
     parser.add_argument("--window-size", type=int, choices=[400, 1000, 2000, 4000], help='Window size for the data')
     parser.add_argument("--num-epochs", type=int, default = 5)
@@ -117,7 +118,9 @@ if __name__ == '__main__':
     encoding_dict = NON_RECURRENT_ENCODING_DICT
     s2s = False
     if args.model == 'bonito':
-        from bonito.model import BonitoModel as Model 
+        from bonito.model import BonitoModel as Model
+    elif args.model == 's5':
+        from bonito.model import S5Model as Model
     elif args.model == 'bonitosnn':
         from bonitosnn.model.snn_model import BonitoSNNModel as Model 
     elif args.model == 'bonitospikeconv':
@@ -142,13 +145,13 @@ if __name__ == '__main__':
         dataset, 
         batch_size = args.batch_size, 
         sampler = dataset.train_sampler, 
-        num_workers = 4
+        num_workers = 2 #TODO: change to 4 in original (2 only for Colab)
     )
     dataloader_validation = DataLoader(
         dataset, 
         batch_size = args.batch_size, 
         sampler = dataset.validation_sampler, 
-        num_workers = 4
+        num_workers = 2  #TODO: change to 4 in original (2 only for Colab)
     )
 
     
@@ -159,7 +162,7 @@ if __name__ == '__main__':
         use_amp = False
         scaler = None
 
-    print('Creating model')
+    print('Creating model: ' + args.model)
     model = Model(
               load_default = True,
               device = device,
@@ -168,10 +171,9 @@ if __name__ == '__main__':
               scaler = None,
               use_amp = False,
               nlstm=0,
-              l2mu = l2mu_dict,
-              nconv = args.one_conv
-          )
-    
+            #   l2mu = l2mu_dict,     #TODO: I have doubts that removing l2mu can be an intelligent solution, even if it is not actually used!
+            #   nconv = args.one_conv  #TODO: I have doubts that removing one_conv can be an intelligent solution, even if it is not actually used!
+        )
     '''model = Model(
           load_default = True,
           device = device,

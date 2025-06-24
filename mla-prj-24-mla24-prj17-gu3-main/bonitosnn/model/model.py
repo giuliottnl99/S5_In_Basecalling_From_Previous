@@ -30,7 +30,7 @@ class CommonBonitoS5Model(BaseModelImpl):
         self.encoder = encoder
         self.decoder = decoder
         self.reverse = reverse
-        self.networkAndDecoderConfig = None
+        # self.networkAndDecoderConfig => Must be defined in the subclass
         
         if load_default:
             self.load_default_configuration()
@@ -53,23 +53,23 @@ class CommonBonitoS5Model(BaseModelImpl):
         cnn = nn.Sequential(
             nn.Conv1d(
                 in_channels = 1, 
-                out_channels = self.networkAndDecoderConfig.out_channels,  #4 for Bonito, 64 for S5
+                out_channels = self.networkAndDecoderConfig['1_layer_out_channels'],  #4 for Bonito, 64 for S5
                 kernel_size = 5, 
                 stride= 1, 
                 padding=5//2, 
                 bias=True),
             nn.SiLU(),
             nn.Conv1d(
-                in_channels = 4, 
-                out_channels = self.networkAndDecoderConfig.out_channels,  #4 for Bonito, 64 for S5
+                in_channels = self.networkAndDecoderConfig['1_layer_out_channels'], 
+                out_channels = self.networkAndDecoderConfig['2_layer_out_channels'],  #4 for Bonito, 64 for S5
                 kernel_size = 5, 
                 stride= 1, 
                 padding=5//2, 
                 bias=True),
             nn.SiLU(),
             nn.Conv1d(
-                in_channels = self.networkAndDecoderConfig.in_channels,  #16 for Bonito, 64 for S5 
-                out_channels = self.networkAndDecoderConfig.decoder_dimension, #384 for Bonito, 256 for S5 
+                in_channels = self.networkAndDecoderConfig['2_layer_out_channels'],  #16 for Bonito, 64 for S5 
+                out_channels = self.networkAndDecoderConfig['decoder_dimension'], #384 for Bonito, 256 for S5 
                 kernel_size = 19, 
                 stride= 5, 
                 padding=19//2, 
@@ -85,8 +85,8 @@ class CommonBonitoS5Model(BaseModelImpl):
 
         self.convolution = self.build_cnn()
         self.cnn_stride = self.get_defaults()['cnn_stride']
-        self.encoder = self.build_encoder(input_size = self.networkAndDecoderConfig.decoder_dimension, reverse = True)
-        self.decoder = self.build_decoder(encoder_output_size = self.networkAndDecoderConfig.decoder_dimension, decoder_type = 'crf')
+        self.encoder = self.build_encoder(input_size = self.networkAndDecoderConfig['decoder_dimension'], reverse = True)
+        self.decoder = self.build_decoder(encoder_output_size = self.networkAndDecoderConfig['decoder_dimension'], decoder_type = 'crf')
         self.decoder_type = 'crf'
 
 
@@ -95,8 +95,8 @@ class BonitoModel(CommonBonitoS5Model):
     """
     def __init__(self, convolution = None, encoder = None, decoder = None, reverse = True, load_default = False, networkAndDecoderConfig=None, *args, **kwargs):
         
-        self.networkAndDecoderConfig = {'out_channels': 4, 'in_channels': 16, 'decoder_dimension': 384}
-        super(BonitoModel, self).__init__(*args, **kwargs)
+        self.networkAndDecoderConfig = {'1_layer_out_channels': 4, '2_layer_out_channels': 16, 'decoder_dimension': 384}
+        super(BonitoModel, self).__init__(load_default=load_default, *args, **kwargs)
         
     def build_encoder(self, input_size, reverse):
 
@@ -130,8 +130,8 @@ class S5Model(CommonBonitoS5Model):
     """
     def __init__(self, convolution = None, encoder = None, decoder = None, reverse = True, load_default = False, networkAndDecoderConfig=None, *args, **kwargs):
         
-        self.networkAndDecoderConfig = {'out_channels': 64, 'in_channels': 64, 'decoder_dimension': 256}
-        super(S5Model, self).__init__(*args, **kwargs)
+        self.networkAndDecoderConfig = {'1_layer_out_channels': 64, '2_layer_out_channels': 64, 'decoder_dimension': 256}
+        super(S5Model, self).__init__(load_default=load_default, *args, **kwargs)
         
     def build_encoder(self, input_size, reverse):
 

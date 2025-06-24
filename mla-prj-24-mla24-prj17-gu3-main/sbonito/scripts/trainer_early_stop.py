@@ -176,6 +176,8 @@ if __name__ == '__main__':
     s2s = False
     if args.model == 'bonito':
         from bonito.model import BonitoModel as Model
+    if args.model == 'S5':
+        from bonito.model import S5Model as Model
     elif args.model == 'bonitosnn':
         from bonitosnn.model.snn_model import BonitoSNNModel as Model
     elif args.model == 'bonitospikeconv':

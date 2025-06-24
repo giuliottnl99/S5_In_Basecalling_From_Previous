@@ -42,7 +42,8 @@ if __name__ == "__main__":
         'urnano',
         'halcyon',
         'bonitosnn',
-        'bonitospikeconv'
+        'bonitospikeconv',
+        'S5'
     ], required = True)
     parser.add_argument("--fast5-dir", type=str, required = False)
     parser.add_argument("--fast5-list", type=str, required = False)
@@ -83,6 +84,8 @@ if __name__ == "__main__":
         args.model_stride = 1
     elif args.model == 'bonito':
         from model import BonitoModel as Model# pyright: reportMissingImports=false
+    elif args.model == 'S5':
+        from model import S5Model as Model# pyright: reportMissingImports=false
     elif args.model == 'catcaller':
         from catcaller.model import CATCallerModel as Model# pyright: reportMissingImports=false
     elif args.model == 'causalcall':
@@ -110,8 +113,8 @@ if __name__ == "__main__":
               scaler = scaler,
               use_amp = use_amp,
               nlstm=0,
-              l2mu = l2mu_dict,
-              one_conv = args.one_conv
+            #   l2mu = l2mu_dict, #TODO: I think this should be kept
+            #   one_conv = args.one_conv
           )
 
     '''
